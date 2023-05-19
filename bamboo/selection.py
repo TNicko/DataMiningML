@@ -55,6 +55,7 @@ def plot_feature_correlations(feature_correlations: dict):
     x_labels = list(feature_correlations.keys())
     nan_indices = np.where(np.isnan(corr_values))[0]
     nan_labels = [x_labels[i] for i in nan_indices]
+    print(nan_labels)
     plt.bar(x_labels, corr_values)
     for i in nan_indices:
         plt.plot([i-0.4, i+0.4], [0, 0], color='r', linewidth=1)
@@ -62,5 +63,6 @@ def plot_feature_correlations(feature_correlations: dict):
     plt.ylabel('Correlation with Target Variable')
     plt.title('Feature Correlations with the Target Variable')
     plt.xticks(rotation=45)
-    plt.legend(['NaN Correlation'])
+    if len(nan_labels) > 0:
+        plt.legend(['NaN Correlation'])
     plt.show()

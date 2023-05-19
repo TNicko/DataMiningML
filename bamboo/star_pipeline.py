@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------------------------------------
 
 import numpy as np
-from processing import fill_missing_numbers, convert_int_to_float
+from bamboo.processing import encode_categorical_data, fill_missing_numbers, convert_int_to_float, get_categorical_columns, fill_categorical_missing
 
 # TODO
 # Remove first ID row as it is useless ???
@@ -26,9 +26,16 @@ def star_pipeline(data: np.ndarray) -> np.ndarray:
             # Fill missing values in all columns containing numbers
             data = fill_missing_numbers(data, column)
     
-    # # Encode categorical columns
-    # categorical_cols = ['fiber_ID']
-    # data = encode_categorical_data(data, categorical_cols)
+    # Get cateforical columns
+    categorical_cols = get_categorical_columns(data)
+
+    # Fill missing values in categorical columns
+    for column in categorical_cols:
+        data = fill_categorical_missing(data, column)
+    
+    # Encode categorical columns
+    data = encode_categorical_data(data, categorical_cols)
+
     
     return data
 

@@ -8,7 +8,7 @@ from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import OrdinalEncoder
 
 def read_csv(csv_file: str) -> np.ndarray:
-    """ Loads data from a CSV file into a numpy array. Infers data types directly from the data. """
+    """Loads data from a CSV file into a numpy array. Infers data types directly from the data. """
     data = np.genfromtxt(csv_file, delimiter=',', dtype=None, names=True)
     return data
 
@@ -25,6 +25,7 @@ def convert_int_to_float(data: np.ndarray) -> np.ndarray:
             new_dtypes.append((name, dtype))
     
     return data.astype(new_dtypes)
+
 
 def remove_columns(data: np.ndarray, columns: list[str]) -> np.ndarray:
     """    
@@ -132,8 +133,8 @@ def get_encoded_column(data: np.ndarray, column: str) -> np.ndarray:
 
 def encode_categorical_data(data: np.ndarray, categorical_cols: list[str]) -> np.ndarray:
     """Encodes the specified categorical columns of a numpy structured array using ordinal encoding."""
-    category_columns = {}
     new_dtypes = [(name, 'float64' if name in categorical_cols else dtype) for name, dtype in data.dtype.descr]
+    category_columns = {}
 
     # Encode and store categorical columns
     for column in categorical_cols:
@@ -170,6 +171,38 @@ def fill_missing_numbers(data: np.ndarray, column: np.ndarray) -> np.ndarray:
 
     return data
 
+def fill_categorical_missing(data: np.ndarray, column: str) -> np.ndarray:
+    """
+    Fills missing values in a given categorical column of a numpy structured array with 
+    random values from the existing categories. The probability of a category being 
+    selected is proportional to its occurrence frequency in the original data.
+
+    Notes
+    -----
+    This function assumes that missing values are represented as empty byte strings (`b''`).
+    """
+    # Get unique categories and their counts, ignoring missing values
+    unique, counts = np.unique(data[column], return_counts=True)
+
+    # Remove the missing category
+    mask = unique != b''
+    unique = unique[mask]
+    counts = counts[mask]
+
+    # Calculate the probabilities for each category
+    probabilities = counts / np.sum(counts)
+    
+    # Find the missing values in the column
+    missing_mask = data[column] == b''
+    
+    # Generate a random array of categories, based on their weights, to fill missing values
+    fill_values = np.random.choice(unique, size=np.sum(missing_mask), p=probabilities)
+    
+    # Fill the missing values
+    data[column][missing_mask] = fill_values
+    
+    return data
+
 def split_features_and_target(data: np.ndarray) -> tuple:
     """Splits the data into features and target arrays."""
     data_names = data.dtype.names
@@ -191,3 +224,8 @@ def get_feature_and_target_names(data: np.ndarray) -> list:
     X_names = data_names[:-1]
     y_name = data_names[-1]
     return X_names, y_name
+
+def get_categorical_columns(data: np.ndarray) -> list:
+    """Returns a list of the string columns that should be converted to categorical for the given data."""
+    categorical_cols = [column for column, dtype in dict(data.dtype.fields).items() if dtype[0].char in {'S', 'U'}]
+    return categorical_cols

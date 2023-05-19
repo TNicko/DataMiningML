@@ -4,21 +4,12 @@
 
 import numpy as np
 from datetime import datetime
-from processing import fill_missing_numbers, encode_categorical_data, split_date_column, convert_dates, convert_int_to_float
+from bamboo.processing import fill_missing_numbers, encode_categorical_data, split_date_column, convert_dates, convert_int_to_float, get_categorical_columns, fill_categorical_missing
 
 
 def gwp_pipeline(data: np.ndarray) -> np.ndarray:
     """
     Applies a pipeline of transformations to the GWP structured numpy array for data preprocessing.
-
-    The transformations include:
-    1. Stripping whitespace from string columns.
-    2. Filling missing values in numeric columns.
-    3. Converting dates to datetime objects.
-    4. Filling missing temporal data based on context.
-    5. Filling missing quarters based on the day of the month.
-    6. Encoding categorical data to numerical representations.
-    7. Splitting the 'date' field into three separate fields: 'year', 'month', and 'day_of_month'.
     """
     for column, dtype in dict(data.dtype.fields).items():
         dtype = dtype[0]
@@ -35,24 +26,19 @@ def gwp_pipeline(data: np.ndarray) -> np.ndarray:
     data = convert_dates(data)        # convert dates to datetime objects
     data = process_gwp_temporal(data) # fill missing dates and days
     data = process_quarter(data)      # fill missing quarters
-    data = process_department(data)   # fill missing departments
-    
-    # Encode categorical columns
-    categorical_cols = ['department', 'quarter', 'day']
-    data = encode_categorical_data(data, categorical_cols)
 
     # Split date column into multiple feature columns
     data = split_date_column(data)
 
-    return data
+    # Get cateforical columns
+    categorical_cols = get_categorical_columns(data)
 
-
-def process_department(data: np.ndarray) -> np.ndarray:
-    """Fill empty cells in department column with random department."""
-    departments = ['finishing', 'sweing']
-    for row in data:
-        if not row['department']:
-            row['department'] = np.random.choice(departments)
+    # Fill missing values in categorical columns
+    for column in categorical_cols:
+        data = fill_categorical_missing(data, column)
+    
+    # Encode categorical columns
+    data = encode_categorical_data(data, categorical_cols)
 
     return data
 
