@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 import seaborn as sns
 from collections import defaultdict
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import numpy as np
 
 def bar_plot_avg_metrics(data: list[dict]):
@@ -253,3 +254,22 @@ def sort_with_none(lst: list):
     Sorts a list that can contain a mix of None, string and other comparable types.
     """
     return sorted(lst, key=lambda x: (x is None, isinstance(x, str), x))
+
+def print_regression_metrics(y_true, y_pred):
+    """
+    Calculate and print regression metrics given true and predicted values.
+
+    Parameters
+    ----------
+    y_true : np.ndarray
+        The true labels.
+    y_pred : np.ndarray
+        The predicted labels.
+    """
+    mae = mean_absolute_error(y_true, y_pred)
+    rmse = np.sqrt(mean_squared_error(y_true, y_pred))
+    r2 = r2_score(y_true, y_pred)
+
+    print(f"Score (R-squared): {r2}")
+    print(f"Mean Absolute Error (MAE): {mae}")
+    print(f"Root Mean Squared Error (RMSE): {rmse}")
