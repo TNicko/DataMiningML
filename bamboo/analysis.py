@@ -1,3 +1,7 @@
+# ----------------------------------------------------------------------------------------------------
+# Description: Contains functions for plotting, visualizing and analyzing data.
+# ----------------------------------------------------------------------------------------------------
+
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 import seaborn as sns
@@ -273,3 +277,25 @@ def print_regression_metrics(y_true, y_pred):
     print(f"Score (R-squared): {r2}")
     print(f"Mean Absolute Error (MAE): {mae}")
     print(f"Root Mean Squared Error (RMSE): {rmse}")
+
+
+def plot_predicted_vs_actual(y_test: np.ndarray, y_pred: np.ndarray):
+    """
+    Plots a scatter plot comparing the predicted values versus the actual values.
+
+    Parameters
+    ----------
+    y_test: np.ndarray
+        The actual target values.
+
+    y_pred: np.ndarray
+        The predicted target values.
+    """
+    plt.figure(figsize=(10, 6))
+    plt.scatter(y_test, y_pred, edgecolor='k')
+    plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'k--', lw=2)
+    plt.xlabel('Actual')
+    plt.ylabel('Predicted')
+    plt.title('Actual vs. Predicted Target Values')
+    plt.grid(True)
+    plt.show()
