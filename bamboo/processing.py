@@ -9,7 +9,7 @@ from sklearn.preprocessing import OrdinalEncoder
 
 def read_csv(csv_file: str) -> np.ndarray:
     """Loads data from a CSV file into a structured numpy array. Infers data types directly from the data. """
-    data = np.genfromtxt(csv_file, delimiter=',', dtype=None, names=True)
+    data = np.genfromtxt(csv_file, delimiter=',', dtype=None, names=True, encoding=None)
     return data
 
 
@@ -94,11 +94,48 @@ def convert_dates(data: np.ndarray) -> np.ndarray:
     for name in data.dtype.names:
         if name == 'date':
             # Convert date strings to datetime objects and store in new array
-            new_data['date'] = [np.datetime64(datetime.strptime(date.decode('utf-8'), "%m/%d/%Y")) if date else 'NaT' for date in data['date']]
+            new_data['date'] = [
+                np.datetime64(datetime.strptime(date.decode('utf-8') if isinstance(date, bytes) 
+                else date, "%m/%d/%Y")) 
+                if date else 'NaT' for date in data['date']]
         else:
             new_data[name] = data[name]
     
     return new_data
+# def convert_dates(data: np.ndarray) -> np.ndarray:
+#     """
+#     Converts string or bytestring representations of dates into datetime objects in a numpy structured array.
+
+#     Parameters
+#     ----------
+#     data : np.ndarray
+#         The input structured numpy array.
+
+#     Returns
+#     -------
+#     new_data : np.ndarray
+#         A new numpy array with the same structure as the input, but with date strings converted to datetime objects.
+#     """
+#     # Step 1: Define a new dtype
+#     new_dtype = []
+#     for name, dtype in data.dtype.descr:
+#         if name == 'date':
+#             new_dtype.append((name, 'datetime64[D]'))  # change date to datetime
+#         else:
+#             new_dtype.append((name, dtype))
+    
+#     # Step 2: Create a new array
+#     new_data = np.empty(data.shape, dtype=new_dtype)
+
+#     # Step 3: Copy values to new array
+#     for name in data.dtype.names:
+#         if name == 'date':
+#             # Convert date strings to datetime objects and store in new array
+#             new_data['date'] = [np.datetime64(datetime.strptime(date.decode('utf-8'), "%m/%d/%Y")) if date else 'NaT' for date in data['date']]
+#         else:
+#             new_data[name] = data[name]
+    
+#     return new_data
 
 
 def split_date_column(data: np.ndarray) -> np.ndarray:
@@ -248,6 +285,7 @@ def fill_missing_numbers(data: np.ndarray, column: np.ndarray) -> np.ndarray:
 
     return data
 
+
 def fill_categorical_missing(data: np.ndarray, column: str) -> np.ndarray:
     """
     Fills missing values in a given categorical column of a numpy structured array with 
@@ -274,7 +312,8 @@ def fill_categorical_missing(data: np.ndarray, column: str) -> np.ndarray:
     unique, counts = np.unique(data[column], return_counts=True)
 
     # Remove the missing category
-    mask = unique != b''
+    mask = unique != '' 
+
     unique = unique[mask]
     counts = counts[mask]
 
@@ -282,7 +321,7 @@ def fill_categorical_missing(data: np.ndarray, column: str) -> np.ndarray:
     probabilities = counts / np.sum(counts)
     
     # Find the missing values in the column
-    missing_mask = data[column] == b''
+    missing_mask = data[column] == ''
     
     # Generate a random array of categories, based on their weights, to fill missing values
     fill_values = np.random.choice(unique, size=np.sum(missing_mask), p=probabilities)
@@ -358,3 +397,36 @@ def get_categorical_columns(data: np.ndarray) -> list:
     """
     categorical_cols = [column for column, dtype in dict(data.dtype.fields).items() if dtype[0].char in {'S', 'U'}]
     return categorical_cols
+
+def print_table_from_array(data: np.ndarray, num_rows: int = 10) -> None:
+    """
+    Prints a table with the column names and the first num_rows rows of the structured numpy array data.
+
+    Parameters
+    ----------
+    data : np.ndarray
+        Structured numpy array to be printed as a table.
+    num_rows : int
+        Number of rows from the top of the data to be printed.
+    """
+
+    # Extract the column names
+    headers = data.dtype.names
+
+    # Determine the maximum width for each column
+    column_widths = [len(header) for header in headers]
+    for row in data[:num_rows]:
+        for i, field in enumerate(row):
+            column_widths[i] = max(column_widths[i], len(str(field)))
+
+    # Create a format string that specifies the width of each column
+    column_format = ' | '.join('{:<%d}' % width for width in column_widths)
+
+    # Print the table header
+    print(column_format.format(*headers))
+    print('-' * len(column_format.format(*headers)))
+
+    # Print each row of the table
+    for row in data[:num_rows]:
+        print(column_format.format(*row))
+
