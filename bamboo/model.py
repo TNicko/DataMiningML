@@ -6,7 +6,7 @@ from sklearn.metrics import precision_recall_curve, roc_curve, auc, det_curve
 from sklearn.experimental import enable_halving_search_cv, enable_halving_search_cv
 from sklearn.model_selection import GridSearchCV, HalvingGridSearchCV
 
-class Model:
+class ModelManager:
     """
     A utility class to handle the training, prediction, and result analysis of a machine learning model.
     This class can handle both basic model fitting and hyperparameter tuning using Grid Search or Halving Grid Search.
@@ -133,6 +133,7 @@ class Model:
             return sorted_configurations[:n_results]
         else:
             raise Exception("Model trained without parameters grid, no configurations available!")
+
 
 def get_classification_prediction_data(model: object, X_test: np.ndarray, y_test: np.ndarray, classes: list) -> list[dict]:
     """
