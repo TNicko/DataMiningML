@@ -11,3 +11,8 @@ __pycache__/
 
 # MAC
 .DS_Store
+
+# Local files
+results/
+models/
+
