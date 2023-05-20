@@ -8,3 +8,6 @@ env
 # Python
 __pycache__/
 .ipynb_checkpoints/
+
+# MAC
+.DS_Store

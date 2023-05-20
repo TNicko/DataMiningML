@@ -1,5 +1,7 @@
 import joblib
 import os
+from sklearn.calibration import label_binarize
+from sklearn.metrics import precision_recall_curve, roc_curve, auc
 from sklearn.experimental import enable_halving_search_cv, enable_halving_search_cv
 from sklearn.model_selection import GridSearchCV, HalvingGridSearchCV
 
@@ -69,3 +71,29 @@ class Model:
             }
         else:
             raise Exception("Model trained without parameters grid, no summary available!")
+
+
+def prepare_classification_predictions(model, X_test, y_test, classes):
+    # Binarize the output
+    y_test_bin = label_binarize(y_test, classes=classes)
+
+    # Compute the prediction probabilities
+    y_scores = model.predict_proba(X_test)
+
+    # Prepare data for each class
+    data_per_class = []
+    for i in range(len(classes)):
+        # Compute the precision-recall curve and ROC curve
+        precision, recall, _ = precision_recall_curve(y_test_bin[:, i], y_scores[:, i])
+        fpr, tpr, _ = roc_curve(y_test_bin[:, i], y_scores[:, i])
+        roc_auc = auc(fpr, tpr)
+
+        data_per_class.append({
+            'precision': precision,
+            'recall': recall,
+            'fpr': fpr,
+            'tpr': tpr,
+            'roc_auc': roc_auc
+        })
+    
+    return data_per_class
