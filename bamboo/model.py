@@ -49,7 +49,7 @@ class Model:
         self.search = None
         self.search_type = search_type
 
-    def fit(self, X, y):
+    def fit(self, X: np.ndarray, y: np.ndarray):
         if self.params:
             if self.search_type == "GridSearch":
                 self.search = GridSearchCV(self.model, self.params, cv=5, verbose=2)
@@ -64,7 +64,7 @@ class Model:
         else:
             self.model.fit(X, y)
 
-    def predict(self, X):
+    def predict(self, X: np.ndarray) -> np.ndarray:
         if self.model:
             return self.model.predict(X)
         else:
@@ -90,13 +90,13 @@ class Model:
     def load_results(self, path: str):
         self.search = joblib.load(path)
 
-    def get_fit_results(self):
+    def get_fit_results(self) -> dict:
         if self.search:
             return self.search.cv_results_
         else:
             raise Exception("Model trained without parameters grid, no fit results available!")
 
-    def get_best_configuration(self):
+    def get_best_configuration(self) -> dict:
         if self.search:
             best_index = self.search.best_index_
             best_fit_time = self.search.cv_results_['mean_fit_time'][best_index]
@@ -109,7 +109,7 @@ class Model:
         else:
             raise Exception("Model trained without parameters grid, no summary available!")
 
-    def get_configurations(self, sort_by: str = 'Score', n_results: int = None, ascending: bool = False):
+    def get_configurations(self, sort_by: str = 'Score', n_results: int = None, ascending: bool = False) -> list[dict]:
         if self.search:
             results = self.get_fit_results()
 
@@ -134,7 +134,7 @@ class Model:
         else:
             raise Exception("Model trained without parameters grid, no configurations available!")
 
-def get_classification_prediction_data(model: object, X_test: np.ndarray, y_test: np.ndarray, classes: list):
+def get_classification_prediction_data(model: object, X_test: np.ndarray, y_test: np.ndarray, classes: list) -> list[dict]:
     """
     Generates classification prediction data for each class in a multi-class classification problem.
     This data includes precision-recall, ROC curve data, and DET curve data.
