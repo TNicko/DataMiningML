@@ -8,7 +8,7 @@ from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import OrdinalEncoder
 
 def read_csv(csv_file: str) -> np.ndarray:
-    """Loads data from a CSV file into a numpy array. Infers data types directly from the data. """
+    """Loads data from a CSV file into a structured numpy array. Infers data types directly from the data. """
     data = np.genfromtxt(csv_file, delimiter=',', dtype=None, names=True)
     return data
 
@@ -16,6 +16,16 @@ def read_csv(csv_file: str) -> np.ndarray:
 def convert_int_to_float(data: np.ndarray) -> np.ndarray:
     """
     Converts the integer columns in a structured numpy array to float.
+
+    Parameters
+    ----------
+    data : np.ndarray
+        The input structured numpy array. 
+
+    Returns
+    -------
+    new_data : np.ndarray
+        A new numpy array with the same structure as the input, but with integer columns converted to float.
     """
     new_dtypes = []
     for name, dtype in data.dtype.descr:
@@ -33,12 +43,15 @@ def remove_columns(data: np.ndarray, columns: list[str]) -> np.ndarray:
 
     Parameters
     ----------
-    data : A numpy structured array from which to remove columns.
-    columns : A list of column names to remove from the data array.
+    data : np.ndarray
+        A numpy structured array.
+    columns : list[str]
+        A list of column names to remove from the array.
 
     Returns
     -------
-    np.ndarray : A new numpy array with the specified columns removed.
+    new_data : np.ndarray
+        A new numpy array with the specified columns removed.
     """
     new_dtypes = dict(data.dtype.descr)
     for column in columns: del new_dtypes[column]
@@ -53,7 +66,19 @@ def remove_columns(data: np.ndarray, columns: list[str]) -> np.ndarray:
     return new_data
 
 def convert_dates(data: np.ndarray) -> np.ndarray:
-    """Converts string or bytestring representations of dates into datetime objects in a numpy structured array."""
+    """
+    Converts string or bytestring representations of dates into datetime objects in a numpy structured array.
+
+    Parameters
+    ----------
+    data : np.ndarray
+        The input structured numpy array.
+
+    Returns
+    -------
+    new_data : np.ndarray
+        A new numpy array with the same structure as the input, but with date strings converted to datetime objects.
+    """
     # Step 1: Define a new dtype
     new_dtype = []
     for name, dtype in data.dtype.descr:
@@ -77,7 +102,19 @@ def convert_dates(data: np.ndarray) -> np.ndarray:
 
 
 def split_date_column(data: np.ndarray) -> np.ndarray:
-    """Splits the 'date' field of a numpy structured array into three separate fields: 'year', 'month', and 'day_of_month'."""
+    """
+    Splits the 'date' field of a numpy structured array into three separate fields: 'year', 'month', and 'day_of_month'.
+
+    Parameters
+    ----------
+    data : np.ndarray
+        The input structured numpy array.
+
+    Returns
+    -------
+    new_data : np.ndarray
+        A new numpy array with the same structure as the input, but with the 'date' field replaced by 'year', 'month', and 'day_of_month' fields.
+    """
     # Create new columns
     year = np.empty(data.shape[0], dtype=int)
     month = np.empty(data.shape[0], dtype=int)
@@ -118,7 +155,21 @@ def split_date_column(data: np.ndarray) -> np.ndarray:
     return new_data
 
 def get_encoded_column(data: np.ndarray, column: str) -> np.ndarray:
-    """Encodes the specified column of a numpy structured array using ordinal encoding."""
+    """
+    Encodes the specified column of a numpy structured array using ordinal encoding.
+
+    Parameters
+    ----------
+    data : np.ndarray
+        The input structured numpy array.
+    column : str
+        The name of the column to be encoded.
+
+    Returns
+    -------
+    encoded_column : np.ndarray
+        A numpy array containing the encoded values of the specified column.
+    """
     # reshape column to 2D array
     data_column = data[:][column].reshape(-1, 1)
     
@@ -132,7 +183,21 @@ def get_encoded_column(data: np.ndarray, column: str) -> np.ndarray:
     return encoded_column
 
 def encode_categorical_data(data: np.ndarray, categorical_cols: list[str]) -> np.ndarray:
-    """Encodes the specified categorical columns of a numpy structured array using ordinal encoding."""
+    """
+    Encodes the specified categorical columns of a numpy structured array using ordinal encoding.
+
+    Parameters
+    ----------
+    data : np.ndarray
+        The input structured numpy array.
+    categorical_cols : list[str]
+        The list of categorical columns to be encoded.
+
+    Returns
+    -------
+    encoded_data : np.ndarray
+        A new numpy array with the same structure as the input, but with the categorical columns encoded as float values.
+    """
     new_dtypes = [(name, 'float64' if name in categorical_cols else dtype) for name, dtype in data.dtype.descr]
     category_columns = {}
 
@@ -157,6 +222,18 @@ def fill_missing_numbers(data: np.ndarray, column: np.ndarray) -> np.ndarray:
     """
     Fills the missing values in the specified column of a numpy structured array.
     It fills missing float values (np.nan) with the mean of the column.
+
+    Parameters
+    ----------
+    data : np.ndarray
+        The input structured numpy array.
+    column : np.ndarray
+        The column in which to fill missing values.
+
+    Returns
+    -------
+    data : np.ndarray
+        The input numpy array with missing values filled in the specified column.
     """
     imp = SimpleImputer(missing_values=np.nan, strategy='mean',)
 
@@ -179,7 +256,19 @@ def fill_categorical_missing(data: np.ndarray, column: str) -> np.ndarray:
 
     Notes
     -----
-    This function assumes that missing values are represented as empty byte strings (`b''`).
+    This function assumes that missing values are represented as empty byte strings (`b'`).
+
+    Parameters
+    ----------
+    data : np.ndarray
+        The input structured numpy array.
+    column : str
+        The name of the column to fill missing values.
+
+    Returns
+    -------
+    data : np.ndarray
+        The input numpy array with missing values filled in the specified column.
     """
     # Get unique categories and their counts, ignoring missing values
     unique, counts = np.unique(data[column], return_counts=True)
@@ -204,7 +293,21 @@ def fill_categorical_missing(data: np.ndarray, column: str) -> np.ndarray:
     return data
 
 def split_features_and_target(data: np.ndarray) -> tuple:
-    """Splits the data into features and target arrays."""
+    """
+    Splits the data into features and target arrays.
+
+    Parameters
+    ----------
+    data : np.ndarray
+        The input structured numpy array.
+
+    Returns
+    -------
+    X : np.ndarray
+        Array of feature variables.
+    y : np.ndarray
+        Array of the target variable.
+    """
     data_names = data.dtype.names
     X_names = data_names[:-1]
     y_name = data_names[-1]
@@ -218,14 +321,40 @@ def split_features_and_target(data: np.ndarray) -> tuple:
 
     return X, y  
 
-def get_feature_and_target_names(data: np.ndarray) -> list:
-    """Returns a list of column names for the given data."""
+def get_feature_and_target_names(data: np.ndarray) -> tuple:
+    """
+    Returns a list of column names for the given data. The last column is assumed to be the target.
+
+    Parameters
+    ----------
+    data : np.ndarray
+        The input structured numpy array.
+
+    Returns
+    -------
+    X_names : list
+        List of names of the feature columns.
+    y_name : str
+        Name of the target column.
+    """
     data_names = data.dtype.names
     X_names = data_names[:-1]
     y_name = data_names[-1]
     return X_names, y_name
 
 def get_categorical_columns(data: np.ndarray) -> list:
-    """Returns a list of the string columns that should be converted to categorical for the given data."""
+    """
+    Returns a list of the string columns that should be converted to categorical for the given data.
+
+    Parameters
+    ----------
+    data : np.ndarray
+        The input structured numpy array.
+
+    Returns
+    -------
+    categorical_cols : list
+        List of names of the categorical columns in the data.
+    """
     categorical_cols = [column for column, dtype in dict(data.dtype.fields).items() if dtype[0].char in {'S', 'U'}]
     return categorical_cols

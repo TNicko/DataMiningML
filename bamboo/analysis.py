@@ -1,11 +1,20 @@
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 import seaborn as sns
-from matplotlib import cycler
 from collections import defaultdict
 import numpy as np
 
-def bar_plot_avg_metrics(data):
+def bar_plot_avg_metrics(data: list[dict]):
+    """
+    The function plots two bar plots - one for average time taken and one for average score for each parameter value.
+    The plots are sorted in ascending order of average values. Each parameter is represented by a different color.
+    
+    Parameters
+    ----------
+    data : list of dict
+        Each dictionary in the list represents a configuration and contains 'Params', 'Time Taken', and 'Score' keys.
+        'Params' is a dictionary itself and contains the parameter values.
+    """
     # Prepare data
     parameters = [param for param in data[0]['Params']]
     param_values = {param: [] for param in parameters}
@@ -41,7 +50,7 @@ def bar_plot_avg_metrics(data):
                 for value in avg_score[param]} for param in parameters}
 
     # Prepare for plotting
-    unique_param_values = {param: sorted(list(set(param_values[param]))) for param in parameters}
+    unique_param_values = {param: sort_with_none(list(set(param_values[param]))) for param in parameters}
     bar_width = 1 / (len(unique_param_values) + 1)  # leave space between groups
 
     fig, axs = plt.subplots(1, 2, figsize=(10, 5), constrained_layout=True)
@@ -79,68 +88,21 @@ def bar_plot_avg_metrics(data):
 
     plt.show()
 
-# def bar_plot_avg_metric(data, metric: str ='time'):
-#     # Validate input
-#     assert metric in ['time', 'score'], 'Invalid metric'
 
-#     if metric == 'time':
-#         metric = 'Time Taken'
-#     if metric == 'score':
-#         metric = 'Score'
+def plot_swarm(configurations: list[dict], parameter: str, color: str = 'purple'):
+    """
+    Plots a swarm plot for the scores of different configurations of a given parameter.
 
-#     # Prepare data
-#     parameters = [param for param in data[0]['Params']]
-#     param_values = {param: [] for param in parameters}
-#     metric_values = {param: [] for param in parameters}
-
-#     cmap = plt.cm.coolwarm
-#     colors = defaultdict(str)
-#     for i, param in enumerate(parameters):
-#         colors[param] = cmap(i / len(parameters) * 1.5)
-#     legend_elements = [Line2D([0], [0], color=colors[param], lw=4, label=param) for param in parameters]
-
-#     for item in data:
-#         for param in parameters:
-#             param_values[param].append(item['Params'][param])
-#             metric_values[param].append(item[metric])
-
-#     # Calculate averages
-#     avg_metrics = {param: defaultdict(float) for param in parameters}
-#     count_metrics = {param: defaultdict(int) for param in parameters}
-#     for param in parameters:
-#         for value, met_value in zip(param_values[param], metric_values[param]):
-#             avg_metrics[param][value] += met_value
-#             count_metrics[param][value] += 1
-#     avg_metrics = {
-#         param: {value: avg_metrics[param][value] / count_metrics[param][value]
-#                 for value in avg_metrics[param]} for param in parameters}
-
-#     # Prepare for plotting
-#     unique_param_values = {param: sorted(list(set(param_values[param]))) for param in parameters}
-#     bar_width = 1 / (len(unique_param_values) + 1)  # leave space between groups
-
-#     fig, ax = plt.subplots()
-
-#     sorted_metrics = []
-#     for param in parameters:
-#         for value in unique_param_values[param]:  
-#             sorted_metrics.append((avg_metrics[param][value], value, param))
-#     sorted_metrics.sort(key=lambda x: x[0])
-
-#     x_position = 0
-#     for item in sorted_metrics:
-#         x_position += 0.3
-#         ax.bar(x_position, item[0], width=bar_width, color=colors[item[2]])
-
-#     # Labeling
-#     ax.set_xticks(np.arange(len(sorted_metrics)) * 0.3 + 0.3)
-#     ax.set_xticklabels([value[1] for value in sorted_metrics], rotation=40)
-#     plt.title(f'Average {metric} for Each Parameter Value')
-#     plt.xlabel('Parameter Value')
-#     plt.ylabel(f'Average {metric}')
-#     ax.legend(handles=legend_elements, loc='upper left')
-
-def plot_swarm(configurations, parameter: str, color: str = 'purple'):
+    Parameters
+    ----------
+    configurations : list of dict
+        Each dictionary in the list represents a configuration and contains 'Params' and 'Score' keys. 
+        'Params' is a dictionary itself and contains the parameter values.
+    parameter : str
+        The parameter for which the swarm plot will be generated.
+    color : str, optional
+        The color of the points in the swarm plot. Default is 'purple'.
+    """
     # Extract the parameter values and scores
     params = [config['Params'][parameter] for config in configurations]
     scores = [config['Score'] for config in configurations]
@@ -156,7 +118,18 @@ def plot_swarm(configurations, parameter: str, color: str = 'purple'):
     # Show the plot
     plt.show()
 
-def plot_precision_recall_curve(data_per_class, classes):
+
+def plot_precision_recall_curve(data_per_class: list[dict], classes: list):
+    """
+    Plots the Precision-Recall curve for multiple classes.
+
+    Parameters
+    ----------
+    data_per_class : list of dict
+        Each dictionary contains 'precision' and 'recall' data for a specific class.
+    classes : list
+        A list of the classes to be plotted.
+    """
     colors = ['teal', 'purple', 'darkorange', 'green']
 
     # For each class
@@ -172,7 +145,18 @@ def plot_precision_recall_curve(data_per_class, classes):
     plt.legend(loc="best")
     plt.title("precision vs. recall curve")
 
-def plot_roc_curve(data_per_class, classes):
+
+def plot_roc_curve(data_per_class: list[dict], classes: list):
+    """
+    Plots the Receiver Operating Characteristic (ROC) curve for multiple classes.
+
+    Parameters
+    ----------
+    data_per_class : list of dict
+        Each dictionary contains 'fpr' (False Positive Rate), 'tpr' (True Positive Rate), and 'roc_auc' (ROC AUC) data for a specific class.
+    classes : list
+        A list of the classes to be plotted.
+    """
     colors = ['teal', 'purple', 'darkorange', 'green']
 
     # For each class
@@ -192,7 +176,17 @@ def plot_roc_curve(data_per_class, classes):
     plt.legend(loc="lower right")
 
 
-def plot_det_curve(data_per_class, classes):
+def plot_det_curve(data_per_class: list[dict], classes: list):
+    """
+    Plots the Detection Error Tradeoff (DET) curve for multiple classes.
+
+    Parameters
+    ----------
+    data_per_class : list of dict
+        Each dictionary contains 'far' (False Acceptance Rate) and 'fnr' (False Non-Acceptance Rate) data for a specific class.
+    classes : list
+        A list of the classes to be plotted.
+    """
     colors = ['teal', 'purple', 'darkorange', 'green']
 
     # For each class
@@ -212,6 +206,28 @@ def plot_det_curve(data_per_class, classes):
 
 
 def plot_side_by_side(*plot_funcs, titles=None, num_cols=2, figsize=(15, 5)):
+    """
+    This function plots multiple graphs side by side on a single figure.
+
+    Parameters
+    ----------
+    *plot_funcs : functions
+        Multiple plotting function calls. Each function should draw a plot when called.
+
+    Optional parameters
+    -------------------
+    titles : list of str 
+        A list of titles for each subplot. Default is None.
+    num_cols : int 
+        Number of columns to use for arranging subplots. Default is 2.
+    figsize : tuple 
+        Figure size as a tuple of width and height in inches. Default is (15, 5).
+
+    Note
+    ----
+    The plotting functions specified in plot_funcs must not call plt.show(), as this function 
+    will call it after arranging all subplots.
+    """
     num_plots = len(plot_funcs)
     num_rows = (num_plots + num_cols - 1) // num_cols
 
@@ -230,3 +246,10 @@ def plot_side_by_side(*plot_funcs, titles=None, num_cols=2, figsize=(15, 5)):
 
     plt.tight_layout()
     plt.show()
+
+
+def sort_with_none(lst: list):
+    """
+    Sorts a list that can contain a mix of None, string and other comparable types.
+    """
+    return sorted(lst, key=lambda x: (x is None, isinstance(x, str), x))

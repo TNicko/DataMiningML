@@ -1,11 +1,48 @@
 import joblib
 import os
+import numpy as np
 from sklearn.calibration import label_binarize
 from sklearn.metrics import precision_recall_curve, roc_curve, auc, det_curve
 from sklearn.experimental import enable_halving_search_cv, enable_halving_search_cv
 from sklearn.model_selection import GridSearchCV, HalvingGridSearchCV
 
 class Model:
+    """
+    A utility class to handle the training, prediction, and result analysis of a machine learning model.
+    This class can handle both basic model fitting and hyperparameter tuning using Grid Search or Halving Grid Search.
+
+    Attributes
+    ----------
+    model : object
+        The underlying model object.
+    params : dict
+        A dictionary of parameters for hyperparameter tuning. Keys are parameter names, values are lists of possible parameter values.
+    search : object
+        A Scikit-learn search object (GridSearchCV or HalvingGridSearchCV).
+    search_type : str
+        The type of search to use for hyperparameter tuning. Options are "GridSearch" or "HalvingGridSearch".
+
+    Methods
+    -------
+    fit(X, y):
+        Fits the model to the provided data. If params is provided, performs hyperparameter tuning using the specified search_type.
+    predict(X):
+        Returns the model's predictions on the provided data.
+    save_model(path):
+        Saves the trained model to the specified path.
+    save_results(path):
+        Saves the results of the hyperparameter tuning to the specified path.
+    load_model(path):
+        Loads a model from the specified path.
+    load_results(path):
+        Loads search results from the specified path.
+    get_fit_results():
+        Returns the results of the hyperparameter tuning.
+    get_best_configuration():
+        Returns a summary of the best configuration found by the hyperparameter tuning.
+    get_configurations(sort_by='Score', n_results=None, ascending=False):
+        Returns a list of configuration summaries, sorted by the specified criterion.
+    """
     def __init__(self, model: object = None, params: dict = None, search_type: str = "GridSearch"):
         self.model = model
         self.params = params
@@ -97,7 +134,27 @@ class Model:
         else:
             raise Exception("Model trained without parameters grid, no configurations available!")
 
-def get_classification_prediction_data(model, X_test, y_test, classes):
+def get_classification_prediction_data(model: object, X_test: np.ndarray, y_test: np.ndarray, classes: list):
+    """
+    Generates classification prediction data for each class in a multi-class classification problem.
+    This data includes precision-recall, ROC curve data, and DET curve data.
+
+    Parameters
+    ----------
+    model : Classifier object
+        The trained classification model.
+    X_test : np.ndarray
+        The features for the test set.
+    y_test : np.ndarray
+        The true labels for the test set. 
+    classes : list
+        List of classes in the classification problem.
+
+    Returns
+    -------
+    data_per_class : list of dict
+        For each class, a dictionary containing precision, recall, FPR, TPR, ROC AUC, FNR and FAR values.
+    """
     # Binarize the output
     y_test_bin = label_binarize(y_test, classes=classes)
 
