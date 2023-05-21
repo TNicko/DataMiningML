@@ -20,7 +20,6 @@ def plot_bar_avg_metrics(data: list[dict]):
         Each dictionary in the list represents a configuration and contains 'Params', 'Time Taken', and 'Score' keys.
         'Params' is a dictionary itself and contains the parameter values.
     """
-    # Prepare data
     parameters = [param for param in data[0]['Params']]
     param_values = {param: [] for param in parameters}
     time_values = {param: [] for param in parameters}
@@ -299,3 +298,15 @@ def plot_predicted_vs_actual(y_test: np.ndarray, y_pred: np.ndarray):
     plt.title('Actual vs. Predicted Target Values')
     plt.grid(True)
     plt.show()
+
+def plot_cluster_sses(sses: list):
+    plt.plot(range(1, len(sses)+1), sses, marker='o')
+    plt.xticks(range(1, len(sses)+1))  # Set the x-axis ticks to integer values
+    plt.xlabel('Number of clusters')
+    plt.ylabel('Sum of squared error (SSE)')
+
+def plot_cluster_silhouettes(scores: list):
+    plt.plot(range(2, len(scores)+2), scores, marker='o')
+    plt.xticks(range(2, len(scores)+2))  # Set the x-axis ticks to integer values
+    plt.xlabel('Number of clusters')
+    plt.ylabel('Silhouette Coefficient')

@@ -286,7 +286,7 @@ def fill_missing_numbers(data: np.ndarray, column: np.ndarray) -> np.ndarray:
     return data
 
 
-def fill_categorical_missing(data: np.ndarray, column: str, seed: bool = False) -> np.ndarray:
+def fill_categorical_missing(data: np.ndarray, column: str) -> np.ndarray:
     """
     Fills missing values in a given categorical column of a numpy structured array with 
     random values from the existing categories. The probability of a category being 
@@ -302,18 +302,11 @@ def fill_categorical_missing(data: np.ndarray, column: str, seed: bool = False) 
         The input structured numpy array.
     column : str
         The name of the column to fill missing values.
-    seed : bool, optional
-        Whether to set the random seed for reproducibility. Defaults to False.
-
     Returns
     -------
     data : np.ndarray
         The input numpy array with missing values filled in the specified column.
     """
-    # Set seed for reproducibility
-    if seed:
-        np.random.seed(seed)
-
     # Get unique categories and their counts, ignoring missing values
     unique, counts = np.unique(data[column], return_counts=True)
 

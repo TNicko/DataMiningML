@@ -11,8 +11,9 @@ from bamboo.processing import encode_categorical_data, fill_missing_numbers, con
 
 # For now i have removed both id rows
 
-def star_pipeline(data: np.ndarray) -> np.ndarray:
+def star_pipeline(data: np.ndarray, seed: int | None = None) -> np.ndarray:
     """Converts the data to the correct data types and fills in missing values."""
+    np.random.seed(seed)
 
     for column, dtype in dict(data.dtype.fields).items():
         dtype = dtype[0]

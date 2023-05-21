@@ -7,10 +7,12 @@ from datetime import datetime
 from bamboo.processing import fill_missing_numbers, encode_categorical_data, split_date_column, convert_dates, convert_int_to_float, get_categorical_columns, fill_categorical_missing
 
 
-def gwp_pipeline(data: np.ndarray) -> np.ndarray:
+def gwp_pipeline(data: np.ndarray, seed: int | None = None) -> np.ndarray:
     """
     Applies a pipeline of transformations to the GWP structured numpy array for data preprocessing.
     """
+    np.random.seed(seed)
+
     for column, dtype in dict(data.dtype.fields).items():
         dtype = dtype[0]
         if dtype.char in {'S', 'U'}:
