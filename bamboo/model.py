@@ -158,6 +158,7 @@ def get_classification_prediction_data(model: object, X_test: np.ndarray, y_test
     """
     # Binarize the output
     y_test_bin = label_binarize(y_test, classes=classes)
+    print(y_test_bin.shape)
 
     # Compute the prediction probabilities
     y_scores = model.predict_proba(X_test)

@@ -9,7 +9,7 @@ from collections import defaultdict
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import numpy as np
 plt.style.use('seaborn-v0_8')
-
+ 
 def plot_bar_avg_metrics(data: list[dict]):
     """
     The function plots two bar plots - one for average time taken and one for average score for each parameter value.
