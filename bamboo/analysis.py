@@ -10,6 +10,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import numpy as np
 plt.style.use('seaborn-v0_8')
  
+
 def plot_bar_avg_metrics(data: list[dict]):
     """
     The function plots two bar plots - one for average time taken and one for average score for each parameter value.
@@ -259,6 +260,7 @@ def sort_with_none(lst: list):
     """
     return sorted(lst, key=lambda x: (x is None, isinstance(x, str), x))
 
+
 def print_regression_metrics(y_true, y_pred):
     """
     Calculate and print regression metrics given true and predicted values.
@@ -300,20 +302,51 @@ def plot_predicted_vs_actual(y_test: np.ndarray, y_pred: np.ndarray):
     plt.grid(True)
     plt.show()
 
+
 def plot_cluster_sses(sses: list):
+    """
+    Plots the Sum of Squared Error (SSE) for different numbers of clusters.
+
+    Parameters
+    ----------
+    sses : list
+        List of SSE values for different numbers of clusters.
+    """
     plt.plot(range(1, len(sses)+1), sses, marker='o')
     plt.xticks(range(1, len(sses)+1))  # Set the x-axis ticks to integer values
     plt.xlabel('Number of clusters')
     plt.ylabel('Sum of squared error (SSE)')
 
+
 def plot_cluster_silhouettes(scores: list):
+    """
+    Plots the Silhouette Coefficient for different numbers of clusters.
+
+    Parameters
+    ----------
+    scores : list
+        List of Silhouette Coefficient values for different numbers of clusters.
+
+    """
     plt.plot(range(2, len(scores)+2), scores, marker='o')
     plt.xticks(range(2, len(scores)+2))  # Set the x-axis ticks to integer values
     plt.xlabel('Number of clusters')
     plt.ylabel('Silhouette Coefficient')
 
 
-def plot_clusters(X: np.ndarray, labels: np.ndarray, title: str = "Clusters"): 
+def plot_clusters(X: np.ndarray, labels: np.ndarray, title: str = "Clusters"):
+    """
+    Plots the data points colored by their cluster labels.
+
+    Parameters
+    ----------
+    X : np.ndarray
+        Feature data array.
+    labels : np.ndarray
+        Cluster labels for each data point.
+    title : str, optional
+        Title of the plot.
+    """ 
     unique_labels = np.unique(labels)
     for label in unique_labels:
         plt.scatter(X[labels == label, 0], X[labels == label, 1], s=20, label=f'Label {label}', alpha=0.5)
@@ -321,10 +354,20 @@ def plot_clusters(X: np.ndarray, labels: np.ndarray, title: str = "Clusters"):
     plt.title(title)
     plt.legend()
 
+
 def plot_2d_data_heatscatter(results: np.ndarray, target_values: np.ndarray, title: str = None):
-    
-    # Scatter plot. The color of each point will represent the value of the target variable.
-    # We use the 'coolwarm' colormap, but you can choose another one if you prefer.
+    """
+    Plots a scatter plot with color-coded regression target values.
+
+    Parameters
+    ----------
+    results : np.ndarray
+        2D array of data points.
+    target_values : np.ndarray
+        Target values for each data point.
+    title : str, optional
+        Title of the plot.
+    """
     scatter = plt.scatter(results[:, 0], results[:, 1], c=target_values, s=20, cmap='coolwarm', alpha=0.6)
     
     plt.colorbar(label='Regression Target Value')  # show color scale
@@ -332,10 +375,18 @@ def plot_2d_data_heatscatter(results: np.ndarray, target_values: np.ndarray, tit
     plt.ylabel('component 2')
     plt.title(title)
 
+
 def plot_2d_data_scatter(results: np.ndarray, title: str = None):
-    
-    # Scatter plot. The color of each point will represent the value of the target variable.
-    # We use the 'coolwarm' colormap, but you can choose another one if you prefer.
+    """
+    Plots a scatter plot of 2D data points.
+
+    Parameters
+    ----------
+    results : np.ndarray
+        2D array of data points.
+    title : str, optional
+        Title of the plot.
+    """
     scatter = plt.scatter(results[:, 0], results[:, 1], s=20, alpha=0.6)
 
     plt.xlabel('component 1')

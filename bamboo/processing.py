@@ -7,6 +7,7 @@ from datetime import datetime
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import OrdinalEncoder
 
+
 def read_csv(csv_file: str) -> np.ndarray:
     """Loads data from a CSV file into a structured numpy array. Infers data types directly from the data. """
     data = np.genfromtxt(csv_file, delimiter=',', dtype=None, names=True, encoding=None)
@@ -65,6 +66,7 @@ def remove_columns(data: np.ndarray, columns: list[str]) -> np.ndarray:
 
     return new_data
 
+
 def convert_dates(data: np.ndarray) -> np.ndarray:
     """
     Converts string or bytestring representations of dates into datetime objects in a numpy structured array.
@@ -102,40 +104,6 @@ def convert_dates(data: np.ndarray) -> np.ndarray:
             new_data[name] = data[name]
     
     return new_data
-# def convert_dates(data: np.ndarray) -> np.ndarray:
-#     """
-#     Converts string or bytestring representations of dates into datetime objects in a numpy structured array.
-
-#     Parameters
-#     ----------
-#     data : np.ndarray
-#         The input structured numpy array.
-
-#     Returns
-#     -------
-#     new_data : np.ndarray
-#         A new numpy array with the same structure as the input, but with date strings converted to datetime objects.
-#     """
-#     # Step 1: Define a new dtype
-#     new_dtype = []
-#     for name, dtype in data.dtype.descr:
-#         if name == 'date':
-#             new_dtype.append((name, 'datetime64[D]'))  # change date to datetime
-#         else:
-#             new_dtype.append((name, dtype))
-    
-#     # Step 2: Create a new array
-#     new_data = np.empty(data.shape, dtype=new_dtype)
-
-#     # Step 3: Copy values to new array
-#     for name in data.dtype.names:
-#         if name == 'date':
-#             # Convert date strings to datetime objects and store in new array
-#             new_data['date'] = [np.datetime64(datetime.strptime(date.decode('utf-8'), "%m/%d/%Y")) if date else 'NaT' for date in data['date']]
-#         else:
-#             new_data[name] = data[name]
-    
-#     return new_data
 
 
 def split_date_column(data: np.ndarray) -> np.ndarray:
@@ -191,6 +159,7 @@ def split_date_column(data: np.ndarray) -> np.ndarray:
     
     return new_data
 
+
 def get_encoded_column(data: np.ndarray, column: str) -> np.ndarray:
     """
     Encodes the specified column of a numpy structured array using ordinal encoding.
@@ -218,6 +187,7 @@ def get_encoded_column(data: np.ndarray, column: str) -> np.ndarray:
     encoded_column = encoder.transform(data_column).flatten()
 
     return encoded_column
+
 
 def encode_categorical_data(data: np.ndarray, categorical_cols: list[str]) -> np.ndarray:
     """
@@ -254,6 +224,7 @@ def encode_categorical_data(data: np.ndarray, categorical_cols: list[str]) -> np
             encoded_data[column] = data[column]
 
     return encoded_data
+
 
 def fill_missing_numbers(data: np.ndarray, column: np.ndarray) -> np.ndarray:
     """
@@ -330,6 +301,7 @@ def fill_categorical_missing(data: np.ndarray, column: str) -> np.ndarray:
     
     return data
 
+
 def split_features_and_target(data: np.ndarray) -> tuple:
     """
     Splits the data into features and target arrays.
@@ -359,6 +331,7 @@ def split_features_and_target(data: np.ndarray) -> tuple:
 
     return X, y  
 
+
 def get_feature_and_target_names(data: np.ndarray) -> tuple:
     """
     Returns a list of column names for the given data. The last column is assumed to be the target.
@@ -380,6 +353,7 @@ def get_feature_and_target_names(data: np.ndarray) -> tuple:
     y_name = data_names[-1]
     return X_names, y_name
 
+
 def get_categorical_columns(data: np.ndarray) -> list:
     """
     Returns a list of the string columns that should be converted to categorical for the given data.
@@ -396,6 +370,7 @@ def get_categorical_columns(data: np.ndarray) -> list:
     """
     categorical_cols = [column for column, dtype in dict(data.dtype.fields).items() if dtype[0].char in {'S', 'U'}]
     return categorical_cols
+
 
 def print_table_from_array(data: np.ndarray, num_rows: int = 10) -> None:
     """

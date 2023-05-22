@@ -1,4 +1,8 @@
 
+# ----------------------------------------------------------------------------------------------------
+# Description: Contains functions for working with clusters and cluster evaluation with Sklearn.
+# ----------------------------------------------------------------------------------------------------
+
 import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score, adjusted_rand_score
@@ -31,6 +35,7 @@ def kmeans_elbow(X: np.ndarray, num_clusters: int, seed: int | None = None) -> l
 
     return sses
 
+
 def kmeans_silhouette(X: np.ndarray, kmeans: KMeans, num_clusters: int, seed: int | None = None) -> list:
     """
     Calculates silhouette scores for KMeans clustering with different numbers of clusters.
@@ -58,7 +63,25 @@ def kmeans_silhouette(X: np.ndarray, kmeans: KMeans, num_clusters: int, seed: in
 
 
 def fit_kmean_cluster(X: np.ndarray, dreduce: object, n_clusters: int, seed: int | None = None) -> KMeans:
+    """
+    Fits a KMeans clustering model to the feature data whilst applying dimensionality reduction.
 
+    Parameters
+    ----------
+    X : np.ndarray
+        Input feature array.
+    dreduce : object
+        Dimensionality reduction object e.g. (PCA or TSNE).
+    n_clusters : int
+        Number of clusters to create.
+    seed : int or None, optional
+        Random seed for reproducibility.
+
+    Returns
+    -------
+    tuple
+        Fitted KMeans object and the transformed data array.
+    """
     # Initialise KMeans object
     kmeans = KMeans(
         n_clusters=n_clusters, 
@@ -74,7 +97,25 @@ def fit_kmean_cluster(X: np.ndarray, dreduce: object, n_clusters: int, seed: int
 
     return kmeans, X_reduce
 
+
 def get_cluster_data(kmeans: KMeans, X_reduce: np.ndarray, y: np.ndarray = None) -> dict:
+    """
+    Retrieves cluster-related data from the KMeans model.
+
+    Parameters
+    ----------
+    kmeans : KMeans
+        Fitted KMeans clustering model.
+    X_reduce : np.ndarray
+        Transformed data array.
+    y : np.ndarray, optional
+        True labels for evaluating the clustering performance.
+
+    Returns
+    -------
+    dict
+        Dictionary containing cluster labels, silhouette score, and optionally ARI score.
+    """
     try:
         labels = kmeans.labels_
     except:

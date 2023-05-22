@@ -29,6 +29,7 @@ def normalize_train_test(X_train: np.ndarray, X_test: np.ndarray) -> tuple:
     X_test_norm = scaler.transform(X_test)
     return X_train_norm, X_test_norm
 
+
 def normalize_data(X: np.ndarray) -> np.ndarray:
     """
     Normalizes the features in the dataset using a MinMaxScaler.
@@ -152,6 +153,7 @@ def plot_feature_correlations(feature_correlations: dict):
     if len(nan_labels) > 0:
         plt.legend(['NaN Correlation'])
     plt.show()
+
 
 def filter_features(
         X: np.ndarray,
