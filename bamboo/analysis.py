@@ -9,90 +9,6 @@ from collections import defaultdict
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import numpy as np
 plt.style.use('seaborn-v0_8')
- 
-
-def plot_bar_avg_metrics(data: list[dict]):
-    """
-    The function plots two bar plots - one for average time taken and one for average score for each parameter value.
-    The plots are sorted in ascending order of average values. Each parameter is represented by a different color.
-    
-    Parameters
-    ----------
-    data : list of dict
-        Each dictionary in the list represents a configuration and contains 'Params', 'Time Taken', and 'Score' keys.
-        'Params' is a dictionary itself and contains the parameter values.
-    """
-    parameters = [param for param in data[0]['Params']]
-    param_values = {param: [] for param in parameters}
-    time_values = {param: [] for param in parameters}
-    score_values = {param: [] for param in parameters}
-
-    cmap = plt.cm.coolwarm
-    colors = defaultdict(str)
-    for i, param in enumerate(parameters):
-        colors[param] = cmap(i / len(parameters) * 1.5)
-    legend_elements = [Line2D([0], [0], color=colors[param], lw=4, label=param) for param in parameters]
-
-    for item in data:
-        for param in parameters:
-            param_values[param].append(item['Params'][param])
-            time_values[param].append(item['Time Taken'])
-            score_values[param].append(item['Score'])
-
-    # Calculate averages
-    avg_time = {param: defaultdict(float) for param in parameters}
-    avg_score = {param: defaultdict(float) for param in parameters}
-    count_metrics = {param: defaultdict(int) for param in parameters}
-    for param in parameters:
-        for value, time, score in zip(param_values[param], time_values[param], score_values[param]):
-            avg_time[param][value] += time
-            avg_score[param][value] += score
-            count_metrics[param][value] += 1
-    avg_time = {
-        param: {value: avg_time[param][value] / count_metrics[param][value]
-                for value in avg_time[param]} for param in parameters}
-    avg_score = {
-        param: {value: avg_score[param][value] / count_metrics[param][value]
-                for value in avg_score[param]} for param in parameters}
-
-    # Prepare for plotting
-    unique_param_values = {param: sort_with_none(list(set(param_values[param]))) for param in parameters}
-    bar_width = 1 / (len(unique_param_values) + 1)  # leave space between groups
-
-    fig, axs = plt.subplots(1, 2, figsize=(10, 5), constrained_layout=True)
-
-    sorted_times = []
-    sorted_scores = []
-    for param in parameters:
-        for value in unique_param_values[param]:  
-            sorted_times.append((avg_time[param][value], value, param))
-            sorted_scores.append((avg_score[param][value], value, param))
-    sorted_times.sort(key=lambda x: x[0])
-    sorted_scores.sort(key=lambda x: x[0])
-
-    # Plotting Time Taken
-    x_position = 0
-    for item in sorted_times:
-        x_position += 0.3
-        axs[0].bar(x_position, item[0], width=bar_width, color=colors[item[2]], label='Time Taken')
-    axs[0].set_xticks(np.arange(len(sorted_times)) * 0.3 + 0.3)
-    axs[0].set_xticklabels([value[1] for value in sorted_times], rotation=40)
-    axs[0].set_ylabel('Average Time Taken')
-    axs[0].set_title('Average Time Taken for Each Parameter Value')
-    axs[0].legend(handles=legend_elements, loc='upper left')
-
-        # Plotting Score
-    x_position = 0
-    for item in sorted_scores:
-        x_position += 0.3
-        axs[1].bar(x_position, item[0], width=bar_width, color=colors[item[2]], label='Score')
-    axs[1].set_xticks(np.arange(len(sorted_scores)) * 0.3 + 0.3)
-    axs[1].set_xticklabels([value[1] for value in sorted_scores], rotation=40)
-    axs[1].set_ylabel('Average Score')
-    axs[1].set_title('Average Score for Each Parameter Value')
-    # axs[1].legend(handles=legend_elements, loc='upper left')
-
-    plt.show()
 
 
 def plot_swarm(configurations: list[dict], parameter: str, color: str = 'purple'):
@@ -209,6 +125,88 @@ def plot_det_curve(data_per_class: list[dict], classes: list):
     plt.title('Detection Error Tradeoff (DET) Curve')
     plt.legend(loc="upper right")
     plt.grid(True)
+
+def plot_bar_avg_metrics(data: list[dict]):
+    """
+    The function plots two bar plots - one for average time taken and one for average score for each parameter value.
+    The plots are sorted in ascending order of average values. Each parameter is represented by a different color.
+    
+    Parameters
+    ----------
+    data : list of dict
+        Each dictionary in the list represents a configuration and contains 'Params', 'Time Taken', and 'Score' keys.
+        'Params' is a dictionary itself and contains the parameter values.
+    """
+    parameters = [param for param in data[0]['Params']]
+    param_values = {param: [] for param in parameters}
+    time_values = {param: [] for param in parameters}
+    score_values = {param: [] for param in parameters}
+
+    cmap = plt.cm.coolwarm
+    colors = defaultdict(str)
+    for i, param in enumerate(parameters):
+        colors[param] = cmap(i / len(parameters) * 1.5)
+    legend_elements = [Line2D([0], [0], color=colors[param], lw=4, label=param) for param in parameters]
+
+    for item in data:
+        for param in parameters:
+            param_values[param].append(item['Params'][param])
+            time_values[param].append(item['Time Taken'])
+            score_values[param].append(item['Score'])
+
+    # Calculate averages
+    avg_time = {param: defaultdict(float) for param in parameters}
+    avg_score = {param: defaultdict(float) for param in parameters}
+    count_metrics = {param: defaultdict(int) for param in parameters}
+    for param in parameters:
+        for value, time, score in zip(param_values[param], time_values[param], score_values[param]):
+            avg_time[param][value] += time
+            avg_score[param][value] += score
+            count_metrics[param][value] += 1
+    avg_time = {
+        param: {value: avg_time[param][value] / count_metrics[param][value]
+                for value in avg_time[param]} for param in parameters}
+    avg_score = {
+        param: {value: avg_score[param][value] / count_metrics[param][value]
+                for value in avg_score[param]} for param in parameters}
+
+    # Prepare for plotting
+    unique_param_values = {param: sort_with_none(list(set(param_values[param]))) for param in parameters}
+    bar_width = 1 / (len(unique_param_values) + 1)  # leave space between groups
+
+    fig, axs = plt.subplots(1, 2, figsize=(10, 5), constrained_layout=True)
+
+    sorted_times = []
+    sorted_scores = []
+    for param in parameters:
+        for value in unique_param_values[param]:  
+            sorted_times.append((avg_time[param][value], value, param))
+            sorted_scores.append((avg_score[param][value], value, param))
+    sorted_times.sort(key=lambda x: x[0])
+    sorted_scores.sort(key=lambda x: x[0])
+
+    # Plotting Time Taken
+    x_position = 0
+    for item in sorted_times:
+        x_position += 0.3
+        axs[0].bar(x_position, item[0], width=bar_width, color=colors[item[2]], label='Time Taken')
+    axs[0].set_xticks(np.arange(len(sorted_times)) * 0.3 + 0.3)
+    axs[0].set_xticklabels([value[1] for value in sorted_times], rotation=40)
+    axs[0].set_ylabel('Average Time Taken')
+    axs[0].set_title('Average Time Taken for Each Parameter Value')
+    axs[0].legend(handles=legend_elements, loc='upper left')
+
+        # Plotting Score
+    x_position = 0
+    for item in sorted_scores:
+        x_position += 0.3
+        axs[1].bar(x_position, item[0], width=bar_width, color=colors[item[2]], label='Score')
+    axs[1].set_xticks(np.arange(len(sorted_scores)) * 0.3 + 0.3)
+    axs[1].set_xticklabels([value[1] for value in sorted_scores], rotation=40)
+    axs[1].set_ylabel('Average Score')
+    axs[1].set_title('Average Score for Each Parameter Value')
+
+    plt.show()
 
 
 def plot_side_by_side(*plot_funcs, titles=None, num_cols=2, figsize=(15, 5)):
