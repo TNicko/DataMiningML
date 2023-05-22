@@ -316,7 +316,7 @@ def plot_cluster_silhouettes(scores: list):
 def plot_clusters(X: np.ndarray, labels: np.ndarray, title: str = "Clusters"): 
     unique_labels = np.unique(labels)
     for label in unique_labels:
-        plt.scatter(X[labels == label, 0], X[labels == label, 1], s=20, label=f'Cluster {label}', alpha=0.5)
+        plt.scatter(X[labels == label, 0], X[labels == label, 1], s=20, label=f'Label {label}', alpha=0.5)
 
     plt.title(title)
     plt.legend()
@@ -337,7 +337,7 @@ def plot_2d_data_scatter(results: np.ndarray, title: str = None):
     # Scatter plot. The color of each point will represent the value of the target variable.
     # We use the 'coolwarm' colormap, but you can choose another one if you prefer.
     scatter = plt.scatter(results[:, 0], results[:, 1], s=20, alpha=0.6)
-    
+
     plt.xlabel('component 1')
     plt.ylabel('component 2')
     plt.title(title)

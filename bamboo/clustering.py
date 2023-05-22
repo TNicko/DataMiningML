@@ -1,7 +1,8 @@
 
 import numpy as np
 from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_score
+from sklearn.metrics import silhouette_score, adjusted_rand_score
+
 
 def kmeans_elbow(X: np.ndarray, num_clusters: int, seed: int | None = None) -> list:
     """
@@ -30,7 +31,7 @@ def kmeans_elbow(X: np.ndarray, num_clusters: int, seed: int | None = None) -> l
 
     return sses
 
-def kmeans_silhouette(X: np.ndarray, num_clusters: int, seed: int | None = None) -> list:
+def kmeans_silhouette(X: np.ndarray, kmeans: KMeans, num_clusters: int, seed: int | None = None) -> list:
     """
     Calculates silhouette scores for KMeans clustering with different numbers of clusters.
 
@@ -54,3 +55,44 @@ def kmeans_silhouette(X: np.ndarray, num_clusters: int, seed: int | None = None)
         silhouette_scores.append(silhouette_score(X, kmeans.labels_))
     
     return silhouette_scores
+
+
+def fit_kmean_cluster(X: np.ndarray, dreduce: object, n_clusters: int, seed: int | None = None) -> KMeans:
+
+    # Initialise KMeans object
+    kmeans = KMeans(
+        n_clusters=n_clusters, 
+        init="k-means++", 
+        n_init='auto',
+        n_init=50,
+        max_iter=500, 
+        random_state=seed)
+
+    # Fit and transform data
+    X_reduce = dreduce.fit_transform(X)
+    kmeans.fit(X_reduce)
+
+    return kmeans, X_reduce
+
+def get_cluster_data(kmeans: KMeans, X_reduce: np.ndarray, y: np.ndarray = None) -> dict:
+    try:
+        labels = kmeans.labels_
+    except:
+        print("Error: No labels found for KMeans object.")
+        return None
+    
+    silhoutte = silhouette_score(X_reduce, labels)
+    
+    data = {
+        "labels": labels, 
+        "silhouette": silhoutte, 
+    }
+    # If y is provided, calculate ARI
+    if y is not None:
+        ari = adjusted_rand_score(y, labels)
+        data["ari"] = ari
+
+    return data
+
+
+
