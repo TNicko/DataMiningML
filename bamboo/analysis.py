@@ -8,6 +8,7 @@ import seaborn as sns
 from collections import defaultdict
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import numpy as np
+plt.style.use('seaborn-v0_8')
 
 def plot_bar_avg_metrics(data: list[dict]):
     """
@@ -88,7 +89,7 @@ def plot_bar_avg_metrics(data: list[dict]):
     axs[1].set_xticklabels([value[1] for value in sorted_scores], rotation=40)
     axs[1].set_ylabel('Average Score')
     axs[1].set_title('Average Score for Each Parameter Value')
-    axs[1].legend(handles=legend_elements, loc='upper left')
+    # axs[1].legend(handles=legend_elements, loc='upper left')
 
     plt.show()
 
@@ -310,3 +311,33 @@ def plot_cluster_silhouettes(scores: list):
     plt.xticks(range(2, len(scores)+2))  # Set the x-axis ticks to integer values
     plt.xlabel('Number of clusters')
     plt.ylabel('Silhouette Coefficient')
+
+
+def plot_clusters(X: np.ndarray, labels: np.ndarray, title: str = "Clusters"): 
+    unique_labels = np.unique(labels)
+    for label in unique_labels:
+        plt.scatter(X[labels == label, 0], X[labels == label, 1], s=20, label=f'Cluster {label}', alpha=0.5)
+
+    plt.title(title)
+    plt.legend()
+
+def plot_2d_data_heatscatter(results: np.ndarray, target_values: np.ndarray, title: str = None):
+    
+    # Scatter plot. The color of each point will represent the value of the target variable.
+    # We use the 'coolwarm' colormap, but you can choose another one if you prefer.
+    scatter = plt.scatter(results[:, 0], results[:, 1], c=target_values, s=20, cmap='coolwarm', alpha=0.6)
+    
+    plt.colorbar(label='Regression Target Value')  # show color scale
+    plt.xlabel('component 1')
+    plt.ylabel('component 2')
+    plt.title(title)
+
+def plot_2d_data_scatter(results: np.ndarray, title: str = None):
+    
+    # Scatter plot. The color of each point will represent the value of the target variable.
+    # We use the 'coolwarm' colormap, but you can choose another one if you prefer.
+    scatter = plt.scatter(results[:, 0], results[:, 1], s=20, alpha=0.6)
+    
+    plt.xlabel('component 1')
+    plt.ylabel('component 2')
+    plt.title(title)
