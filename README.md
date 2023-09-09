@@ -1,4 +1,4 @@
-# Machine Learning Analysis Repo
+# ML Analysis of Stellar Classification & GWP Datasets
 
 This repository contains code and notebooks for performing machine learning analysis on various datasets. The analysis is divided into different tasks, each focusing on specific aspects of data processing, model building, evaluation, and visualization.
 
